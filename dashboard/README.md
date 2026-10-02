@@ -1,0 +1,53 @@
+# Room monitor (Next.js dashboard)
+
+Live dashboard for the Acoustic Occupancy & Thermal Leak Dual-Tracker backend.
+It shows, per room: chance the room is occupied, window/wall vs room temperature, thermal anomaly, a
+timeline, a "what changed" log, and building totals. A "Run demo story" button plays the Room A-101
+scenario with no hardware.
+
+## Start it (Mac)
+
+1. Keep the backend running on port 8000 (in its own Terminal tab):
+   ```
+   cd occupancy-backend
+   source .venv/bin/activate
+   uvicorn app.main:app --reload
+   ```
+2. In a second Terminal tab:
+   ```
+   cd dashboard
+   cp .env.local.example .env.local
+   npm install
+   npm run dev
+   ```
+3. Open http://localhost:3000
+
+Needs Node 18.18 or newer (`node --version`). If older, install the current LTS from https://nodejs.org.
+
+## Settings (`.env.local`)
+
+| Variable | Meaning |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | Where the backend is. Default `http://localhost:8000`. |
+| `DEVICE_API_KEY` | Must equal `DEVICE_API_KEY` in the backend's `.env` (e.g. `hackathon-demo-key-2026`). Used only on the server by the demo button, never sent to the browser. |
+
+After changing `.env.local`, stop and rerun `npm run dev`.
+
+## Troubleshooting
+
+- **"Can't reach the backend"**: uvicorn is not running, or the URL above is wrong. The page reconnects by itself.
+- **"No rooms yet"**: set `SEED_DEMO_DATA=true` in the backend `.env` and restart it.
+- **Demo button says DEVICE_API_KEY is missing / 401**: the two keys differ or `.env.local` was not created; fix and restart `npm run dev`.
+- **Browser blocks requests (CORS)**: the backend's `CORS_ORIGINS` must include `http://localhost:3000` (it does by default).
+- **Status shows "Offline, retrying"**: the WebSocket dropped; it retries with backoff.
+
+## Design
+
+Dark control-centre theme. Teal = normal/occupied, amber = thermal anomaly and warnings, grey = vacant/inactive. All colours are CSS variables at the top of `src/app/globals.css` (a light theme is available from the sun/moon button). Fonts are Geist, installed by `npm install`.
+
+## Notes
+
+- Occupancy comes from sound only; the temperature gap comes from two sensors. Both are indications, not proof.
+- Energy figures are estimates from the HVAC rating, never measurements.
+- Simulated readings are always labelled "SIMULATED DATA".
+- Use "Show as table" under the chart for the raw numbers; arrow keys move the chart cursor.

@@ -1,0 +1,56 @@
+# Starts the whole stack:  FastAPI backend + PostgreSQL + Mosquitto MQTT broker
+#
+#   cp .env.example .env        # then set DEVICE_API_KEY
+#   docker compose up --build
+#
+# Backend: http://localhost:8000/docs      MQTT broker: localhost:1883
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      # Development default. Set POSTGRES_PASSWORD in .env for anything shared or deployed.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-occupancy}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432" # only reachable from your own machine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-occupancy}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mqttdata:/mosquitto/data
+    ports:
+      - "1883:1883"
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-occupancy}
+      MQTT_ENABLED: "true"
+      MQTT_BROKER: mqtt
+      MQTT_PORT: "1883"
+      DEVICE_API_KEY: ${DEVICE_API_KEY:?Set DEVICE_API_KEY in your .env file (see .env.example)}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  mqttdata:
