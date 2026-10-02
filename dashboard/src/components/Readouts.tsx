@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { degrees, percent } from "@/lib/words";
+import AnimatedNumber from "./AnimatedNumber";
 import Icon from "./Icons";
 import type { RoomView } from "./Headline";
 
@@ -23,7 +24,7 @@ export default function Readouts({ view }: { view: RoomView }) {
           <Icon name="users" size={15} />
           Chance the room is occupied
         </h3>
-        <p className="value">{live && view.confidence !== null ? Math.round(view.confidence * 100) : "–"}{live && view.confidence !== null && <small>%</small>}</p>
+        <p className="value">{live && view.confidence !== null ? <AnimatedNumber value={view.confidence * 100} /> : "–"}{live && view.confidence !== null && <small>%</small>}</p>
         <Meter value={live ? view.confidence : null} color="var(--accent)" tick={0.5} />
         <p className="hint">Based on sound only, so it is a confidence and not proof that someone is there.</p>
       </section>
@@ -60,7 +61,7 @@ export default function Readouts({ view }: { view: RoomView }) {
           <Icon name="alert" size={15} />
           Thermal anomaly
         </h3>
-        <p className="value">{live && view.anomaly !== null ? Math.round(view.anomaly * 100) : "–"}{live && view.anomaly !== null && <small>%</small>}</p>
+        <p className="value">{live && view.anomaly !== null ? <AnimatedNumber value={view.anomaly * 100} /> : "–"}{live && view.anomaly !== null && <small>%</small>}</p>
         <Meter value={live ? view.anomaly : null} color="var(--warn)" tick={0.5} />
         <p className="hint">A leak candidate is raised only after the gap lasts several minutes. The mark shows the 50% flag level.</p>
       </section>

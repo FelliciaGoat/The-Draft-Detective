@@ -86,12 +86,33 @@ export interface LiveMessage {
   recommendation: { action: RecommendedAction; reason: string };
 }
 
+export interface SimulationTransition {
+  timestamp: string;
+  room_state: RoomState;
+  recommended_action: RecommendedAction;
+  occupancy_confidence: number | null;
+  thermal_anomaly_score: number | null;
+  leak_candidate: boolean;
+}
+
 export interface SimulationRun {
   run_id: string;
   status: "completed" | "running" | "stopped" | "failed";
+  scenario?: string;
+  room_id?: number;
+  start_time?: string;
   readings_planned: number;
   readings_generated: number;
+  transitions?: SimulationTransition[];
   error: string | null;
+}
+
+/** What the dashboard's /api/demo route returns when a demo starts. */
+export interface DemoStart {
+  story: SimulationRun;
+  /** Background runs in the other rooms (building demo only). */
+  others: { room_id: number; room_name: string; scenario: string; run_id: string }[];
+  created_rooms: string[];
 }
 
 export class ApiError extends Error {

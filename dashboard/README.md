@@ -1,9 +1,21 @@
 # Room monitor (Next.js dashboard)
 
 Live dashboard for the Acoustic Occupancy & Thermal Leak Dual-Tracker backend.
-It shows, per room: chance the room is occupied, window/wall vs room temperature, thermal anomaly, a
-timeline, a "what changed" log, and building totals. A "Run demo story" button plays the Room A-101
-scenario with no hardware.
+It shows:
+
+- **Building view**: every room as a tile on its floor, coloured by state (teal occupied, grey vacant,
+  hatched uncertain, dashed no data). An amber window edge means the window wall is drifting from room
+  temperature; an amber glowing outline is a leak candidate. Hover a tile for details, click to open it.
+- **Room detail**: chance occupied, window/wall vs room temperature, thermal anomaly, timeline and a
+  "what changed" log.
+- **Live notifications** when any room changes state, and numbers that animate to new values.
+- **Demo without hardware**, two buttons:
+  - **Run building demo**: adds 7 demo rooms (A-102…A-104, B-201…B-204) if they don't exist and plays
+    a different simulated scenario in each, while the selected room plays the 30-minute story.
+  - **This room only**: just the story in the selected room.
+  A guided timeline above the building ticks off each step of the story (occupied, everyone leaves,
+  energy saving, window drifts, leak candidate) from what the engine actually decided.
+- Works on phones: the sidebar collapses to a header and the building grid reflows.
 
 ## Start it (Mac)
 

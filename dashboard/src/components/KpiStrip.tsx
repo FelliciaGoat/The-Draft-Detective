@@ -1,5 +1,6 @@
 import type { DashboardSummary } from "@/lib/api";
 import { kwh } from "@/lib/words";
+import AnimatedNumber from "./AnimatedNumber";
 import Icon from "./Icons";
 
 interface Props {
@@ -28,7 +29,7 @@ export default function KpiStrip({ summary }: Props) {
           Occupancy
         </div>
         <div className="kpi-value">
-          <span className="big">{s ? s.occupied_rooms : "–"}</span>
+          <span className="big">{s ? <AnimatedNumber value={s.occupied_rooms} /> : "–"}</span>
           <span className="of">{s ? `of ${plural(total, "room", "rooms")} occupied` : ""}</span>
         </div>
         <div className="segments" role="img" aria-label={s ? `${s.occupied_rooms} occupied, ${s.vacant_rooms} vacant, ${s.uncertain_rooms} uncertain` : "No data"}>
@@ -69,7 +70,7 @@ export default function KpiStrip({ summary }: Props) {
           Thermal anomalies
         </div>
         <div className="kpi-value">
-          <span className="big">{s ? anomalies : "–"}</span>
+          <span className="big">{s ? <AnimatedNumber value={anomalies} /> : "–"}</span>
           <span className="of">{anomalies === 1 ? "leak candidate" : "leak candidates"}</span>
         </div>
         <p className="kpi-sub">
@@ -83,7 +84,7 @@ export default function KpiStrip({ summary }: Props) {
           Estimated saving today
         </div>
         <div className="kpi-value">
-          <span className="big">{kwh(s?.estimated_energy_saved_today)}</span>
+          <span className="big">{s ? <AnimatedNumber value={s.estimated_energy_saved_today} format={(n) => kwh(n)} /> : "–"}</span>
           <span className="unit">kWh</span>
         </div>
         <p className="kpi-sub">
